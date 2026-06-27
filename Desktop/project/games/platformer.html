@@ -1,0 +1,302 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Neon Rush</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/platformer.css">
+</head>
+<body>
+  <a href="../index.html" id="hub-btn">🎮 Hub</a>
+
+  <!-- Mute button -->
+  <button id="mute-btn" title="Mute / Unmute (M)">🔊</button>
+  <!-- Settings button — always visible -->
+  <button id="sett-btn" title="Settings">⚙</button>
+
+  <!-- Admin button (only visible when admin session is active) -->
+  <button id="admin-btn">🔧 Admin</button>
+
+  <!-- Admin panel -->
+  <div id="admin-panel">
+    <div class="adm-box">
+      <button class="adm-close" id="adm-close">✕</button>
+
+      <!-- Sticky header -->
+      <div class="adm-head">
+        <div class="adm-head-icon">🔧</div>
+        <div>
+          <div class="adm-title">ADMIN PANEL</div>
+          <div class="adm-sub">Neon Rush — Developer Controls</div>
+        </div>
+      </div>
+
+      <!-- Login gate (shown when not authenticated) -->
+      <div id="adm-login-gate" style="display:none;flex-direction:column;align-items:center;gap:14px;padding:28px 32px 32px;text-align:center;">
+        <div style="font-size:2rem;filter:drop-shadow(0 0 14px rgba(180,80,255,.7))">🔐</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:.12em;color:#c880ff;">ADMIN LOGIN</div>
+        <input id="adm-pw-input" type="password" placeholder="Enter admin code" maxlength="32" autocomplete="off"
+          style="width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(160,80,255,.38);border-radius:10px;color:#e0ccff;font-size:1rem;padding:10px 16px;outline:none;font-family:'Orbitron',monospace;letter-spacing:.12em;text-align:center;transition:border-color .2s,box-shadow .2s;">
+        <div id="adm-pw-msg" style="font-size:.72rem;min-height:14px;color:#ff6666;letter-spacing:.05em;"></div>
+        <button id="adm-login-btn" style="font-family:'Orbitron',sans-serif;background:linear-gradient(135deg,rgba(120,0,220,.65),rgba(80,0,160,.55));border:1px solid rgba(200,100,255,.50);color:#e0aaff;padding:10px 32px;border-radius:10px;font-size:.8rem;font-weight:900;letter-spacing:.06em;cursor:pointer;transition:.15s;">🔓 Login</button>
+      </div>
+
+      <!-- Scrollable body -->
+      <div class="adm-scroll" id="adm-controls" style="display:none;">
+
+        <!-- Live Stats -->
+        <div class="adm-section-label">📊 Live Stats</div>
+        <div class="adm-grid">
+          <div class="adm-stat">Level <b id="adm-lv">—</b></div>
+          <div class="adm-stat">Score <b id="adm-sc">—</b></div>
+          <div class="adm-stat">Lives <b id="adm-li">—</b></div>
+          <div class="adm-stat">Coins <b id="adm-co">—</b></div>
+        </div>
+
+        <div class="adm-divider"></div>
+
+        <!-- Cheat Toggles -->
+        <div class="adm-section-label">⚡ Cheat Toggles</div>
+        <div class="adm-grid">
+          <div class="adm-toggle" id="tog-god" onclick="adminToggle('god')">
+            <span>☠ God Mode</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle" id="tog-speed" onclick="adminToggle('speed')">
+            <span>⚡ Speed ×2</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle" id="tog-ink" onclick="adminToggle('ink')">
+            <span>✏ Infinite Ink</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle" id="tog-fly" onclick="adminToggle('fly')">
+            <span>🕊 No Gravity</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle" id="tog-jumps" onclick="adminToggle('jumps')">
+            <span>∞ Unlim Jumps</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle" id="tog-freeze" onclick="adminToggle('freeze')">
+            <span>❄ Freeze Enemies</span><div class="pill"></div>
+          </div>
+          <div class="adm-toggle adm-row" id="tog-slow" onclick="adminToggle('slow')">
+            <span>🐢 Slow Motion (×0.4)</span><div class="pill"></div>
+          </div>
+        </div>
+
+        <div class="adm-divider"></div>
+
+        <!-- Actions -->
+        <div class="adm-section-label">🎮 Actions</div>
+        <div class="adm-grid">
+          <button class="adm-btn" onclick="adminAddLives()">➕ Add 3 Lives</button>
+          <button class="adm-btn" onclick="adminAddScore()">💰 +1000 Score</button>
+          <button class="adm-btn" onclick="adminRefillInk(this)">🖊 Refill Ink</button>
+          <button class="adm-btn" onclick="adminCollectCoins(this)">🪙 Collect All Coins</button>
+          <button class="adm-btn" onclick="adminTeleportCP(this)">📍 Teleport to CP</button>
+          <button class="adm-btn" onclick="adminSkipLevel()">⏭ Skip Level</button>
+          <button class="adm-btn adm-row" onclick="adminRestartLevel()">🔄 Restart Level</button>
+        </div>
+
+        <div class="adm-divider"></div>
+
+        <!-- Level Jump -->
+        <div class="adm-section-label">🗺 Jump to Level</div>
+        <div class="adm-grid" id="adm-level-btns"></div>
+
+        <div class="adm-divider"></div>
+
+        <!-- Data management -->
+        <div class="adm-section-label">⚠ Data</div>
+        <div class="adm-grid">
+          <button class="adm-btn warn" onclick="adminUnlockAll(this)">🔓 Unlock All Levels</button>
+          <button class="adm-btn danger" onclick="adminWipeScores(this)">🗑 Wipe Best Times</button>
+        </div>
+
+      </div><!-- end adm-scroll -->
+    </div>
+  </div>
+
+  <div id="hud">
+    <div class="h-chip">SCO <b id="h-score">0</b></div>
+    <div class="h-sep"></div>
+    <div class="h-chip">LVL <b id="h-level">1</b></div>
+    <div class="h-sep"></div>
+    <div class="h-chip"><b id="h-lives">♥♥♥</b></div>
+    <div class="h-sep"></div>
+    <div class="h-chip">🪙 <b id="h-coins">0</b></div>
+  </div>
+
+  <!-- Drawing toolbar -->
+  <div id="draw-hud">
+    <div id="ink-wrap">
+      INK&nbsp;<div id="ink-bar"><div id="ink-fill"></div></div>
+    </div>
+    <div id="color-row"></div>
+    <!-- 92 platform count -->
+    <div id="plat-count">PLATS <b id="pc">0</b>/5</div>
+    <!-- 91 clear platforms button -->
+    <button id="btn-clear-plats" title="Clear all drawn platforms" style="
+      background:rgba(120,0,0,.6);border:1px solid rgba(255,60,60,.4);
+      color:#ff9090;border-radius:7px;padding:3px 10px;
+      font-family:'Orbitron',sans-serif;font-size:9px;cursor:pointer;white-space:nowrap;
+    ">✕ CLEAR</button>
+  </div>
+  <!-- 84 controls hint strip -->
+  <div id="ctrl-hud">
+    ←→ Move &nbsp;|&nbsp; Space Jump &nbsp;|&nbsp; X Dash &nbsp;|&nbsp; Shift Sprint &nbsp;|&nbsp; Draw w/ mouse &nbsp;|&nbsp; Esc Pause
+  </div>
+  <div id="undo-hint">Ctrl+Z — undo &nbsp;|&nbsp; Right-click — erase</div>
+
+  <canvas id="gc"></canvas>
+
+  <!-- 90 mobile d-pad -->
+  <div id="dpad">
+    <div class="dp-group">
+      <div class="dp-btn" id="dp-left">◀</div>
+      <div class="dp-btn" id="dp-right">▶</div>
+    </div>
+    <div class="dp-group">
+      <div class="dp-btn dp-dash" id="dp-dash">X</div>
+      <div class="dp-btn dp-jump" id="dp-jump">▲</div>
+    </div>
+  </div>
+
+  <!-- 87 start screen with press-space hint -->
+  <div class="screen" id="screen-start">
+    <h1>⚡ NEON RUSH</h1>
+    <p>
+      ← → / A D — Move &nbsp;|&nbsp; Shift — Sprint<br>
+      Space / W / ↑ — Jump &nbsp;|&nbsp; ↓ / S — Crouch<br>
+      Double-jump · Wall-slide &amp; wall-jump · <b style="color:#ff90ff">X / Ctrl — Dash</b><br><br>
+      <b style="color:#ffe040">Yellow</b> = Bounce &nbsp;
+      <b style="color:#60d8ff">Blue</b> = Ice &nbsp;
+      <b style="color:#ff9020">Orange</b> = Conveyor<br>
+      <b style="color:#c050ff">Purple blink</b> = Disappear &nbsp;
+      <b style="color:#ff60cc">Pink</b> = Shrinking<br><br>
+      <span style="color:#c080ff">✏ Draw platforms with mouse &nbsp;|&nbsp; Right-click — erase</span>
+    </p>
+    <button id="btn-play">PLAY</button>
+    <p style="margin-top:12px;margin-bottom:0;font-size:10px;color:rgba(160,110,255,.45);animation:blink 1.4s infinite">PRESS SPACE TO START</p>
+  </div>
+
+  <div class="screen" id="screen-over">
+    <h1>GAME OVER</h1>
+    <p id="over-msg"></p>
+    <button id="btn-retry">RETRY</button>
+  </div>
+
+  <!-- 88 win screen — time, coins, stars, replay -->
+  <div class="screen" id="screen-clear">
+    <h1>LEVEL CLEAR!</h1>
+    <p id="clear-msg"></p>
+    <button id="btn-next">NEXT LEVEL</button>
+    <button id="btn-replay-clear">REPLAY</button>
+    <button id="btn-ls-clear" style="font-size:11px;padding:8px 20px">LEVEL SELECT</button>
+  </div>
+
+  <div class="screen" id="screen-allclear">
+    <h1>YOU WIN! 🏆</h1>
+    <p id="allclear-msg"></p>
+    <button id="btn-again">PLAY AGAIN</button>
+    <button id="btn-replay-all">REPLAY</button>
+  </div>
+
+  <!-- 86 pause menu -->
+  <div class="screen" id="screen-pause">
+    <div class="pause-box">
+      <h1 style="font-size:clamp(20px,4vw,36px);margin-bottom:4px">PAUSED</h1>
+      <p style="margin-bottom:8px;font-size:11px;color:rgba(160,110,200,.6)">ESC to resume</p>
+      <button id="btn-resume">RESUME</button>
+      <button id="btn-pause-restart">RESTART</button>
+      <button id="btn-pause-quit" style="font-size:11px;padding:8px 20px">QUIT TO MENU</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-levelselect" style="overflow-y:auto;padding:20px 10px;">
+    <h1>⚡ NEON RUSH</h1>
+    <p style="margin-bottom:14px">Choose your mission</p>
+    <div id="level-cards"></div>
+    <button id="btn-settings" style="margin-top:6px;font-size:12px;padding:9px 28px">⚙ SETTINGS</button>
+  </div>
+
+  <!-- Dedicated settings screen -->
+  <div class="screen" id="screen-settings" style="overflow-y:auto;padding:16px 10px;">
+    <div class="sett-box">
+      <div class="sett-title">⚙ SETTINGS</div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Difficulty -->
+      <div class="sett-row">
+        <span class="sett-label">DIFFICULTY</span>
+        <div class="sett-btns">
+          <div class="diff-btn" id="diff-0" tabindex="0">EASY</div>
+          <div class="diff-btn active" id="diff-1" tabindex="0">NORMAL</div>
+          <div class="diff-btn" id="diff-2" tabindex="0">HARD</div>
+        </div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Skin picker -->
+      <div class="sett-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <span class="sett-label">SKIN</span>
+        <div id="skin-slots" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;"></div>
+        <div id="skin-name-preview" style="font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;color:#c080ff;text-align:center;width:100%;min-height:14px;text-shadow:0 0 12px currentColor;"></div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Trail style -->
+      <div class="sett-row">
+        <span class="sett-label">TRAIL STYLE</span>
+        <div class="sett-btns">
+          <div class="diff-btn trail-btn" id="trail-default" tabindex="0">DEFAULT</div>
+          <div class="diff-btn trail-btn" id="trail-comet"   tabindex="0">COMET</div>
+          <div class="diff-btn trail-btn" id="trail-sparkle" tabindex="0">SPARKLE</div>
+          <div class="diff-btn trail-btn" id="trail-none"    tabindex="0">NONE</div>
+        </div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Mobile controls -->
+      <div class="sett-row">
+        <span class="sett-label">MOBILE CONTROLS</span>
+        <div class="sett-btns">
+          <div class="diff-btn" id="tog-dpad-off" tabindex="0">OFF</div>
+          <div class="diff-btn" id="tog-dpad-on" tabindex="0">ON</div>
+        </div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Sound -->
+      <div class="sett-row">
+        <span class="sett-label">SOUND</span>
+        <div class="sett-btns">
+          <div class="diff-btn" id="sett-sound-on" tabindex="0">ON</div>
+          <div class="diff-btn" id="sett-sound-off" tabindex="0">OFF</div>
+        </div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <!-- Accessories shop -->
+      <div class="sett-row" style="flex-direction:column;align-items:flex-start;gap:10px;">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
+          <span class="sett-label">ACCESSORIES</span>
+          <span id="sett-wallet" style="font-family:'Orbitron',monospace;font-size:10px;color:#ffd700;letter-spacing:.06em;">🪙 0</span>
+        </div>
+        <div id="acc-slots" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;"></div>
+      </div>
+
+      <div class="sett-divider"></div>
+
+      <button id="btn-sett-back" style="margin-top:4px;font-size:12px;padding:9px 28px">← BACK</button>
+    </div>
+  </div>
+
+<script src="../js/platformer.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Game Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: radial-gradient(ellipse at 50% 0%, #1e0a3c 0%, #0a0812 60%, #05030d 100%);
+      min-height: 100vh;
+    }
+
+    .orbitron { font-family: 'Orbitron', sans-serif; }
+
+    /* Card glow colors on hover */
+    .card-snake:hover   { box-shadow: 0 0 0 1px rgba(0,255,180,0.5),  0 8px 40px rgba(0,255,180,0.2); }
+    .card-chess:hover   { box-shadow: 0 0 0 1px rgba(180,80,255,0.5), 0 8px 40px rgba(180,80,255,0.2); }
+    .card-quest:hover   { box-shadow: 0 0 0 1px rgba(255,210,0,0.5),  0 8px 40px rgba(255,210,0,0.2); }
+    .card-platform:hover{ box-shadow: 0 0 0 1px rgba(255,120,0,0.5),  0 8px 40px rgba(255,120,0,0.2); }
+    .card-drive:hover   { box-shadow: 0 0 0 1px rgba(0,220,255,0.5),  0 8px 40px rgba(0,220,255,0.25); }
+
+    /* Shimmer sweep on hover */
+    .card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+      background-size: 200% 200%;
+      background-position: 200% 200%;
+      transition: background-position 0.6s ease;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .card:hover::before { background-position: -50% -50%; }
+
+    /* Top shimmer line on each card */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      border-radius: 1px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50%       { transform: translateY(-8px); }
+    }
+    .float { animation: float 3.5s ease-in-out infinite; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+
+    @keyframes titleGlow {
+      0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.4), 0 0 60px rgba(255,180,0,0.2); }
+      50%       { text-shadow: 0 0 30px rgba(255,215,0,0.7), 0 0 80px rgba(255,180,0,0.35); }
+    }
+    .title-glow { animation: titleGlow 3s ease-in-out infinite; }
+
+    /* Stars */
+    #stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center px-4 py-16 relative overflow-x-hidden">
+
+  <canvas id="stars"></canvas>
+
+  <div class="relative z-10 w-full max-w-5xl flex flex-col items-center gap-12">
+
+    <!-- Header -->
+    <div class="text-center fade-up" style="animation-delay: 0s">
+      <p class="text-xs tracking-[0.3em] text-purple-500 uppercase mb-4">Welcome to</p>
+      <h1 class="orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-yellow-300 tracking-wider title-glow mb-4">
+        My Game Hub
+      </h1>
+      <p class="text-purple-400/60 text-sm tracking-widest uppercase">5 games · pick your challenge</p>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-purple-700/40 to-transparent fade-up" style="animation-delay:0.1s"></div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 w-full">
+
+      <!-- Snake -->
+      <a href="./games/snake.html"
+         class="card card-snake group relative flex flex-col items-center gap-4 p-7 rounded-2xl
+                bg-white/[0.03] border border-white/10 overflow-hidden
+                transition-all duration-300 hover:-translate-y-2 no-underline
+                fade-up" style="animation-delay: 0.15s">
+        <div class="text-6xl float" style="animation-delay:0s">🐍</div>
+        <div class="text-center">
+          <div class="orbitron text-sm font-black tracking-widest text-cyan-300 mb-1">NEON SNAKE</div>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-cyan-500/50 border border-cyan-500/20 rounded-full px-2.5 py-0.5 uppercase">Arcade</span>
+        </div>
+        <p class="text-xs text-purple-300/40 leading-relaxed text-center flex-1">
+          Eat, grow, survive. How long can your snake get before it eats itself?
+        </p>
+        <button class="w-full py-3 rounded-xl orbitron text-xs font-black tracking-widest
+                       bg-gradient-to-r from-cyan-500 to-teal-600 text-black
+                       transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-cyan-500/30">
+          ▶ PLAY
+        </button>
+      </a>
+
+      <!-- Chess -->
+      <a href="./games/chess.html"
+         class="card card-chess group relative flex flex-col items-center gap-4 p-7 rounded-2xl
+                bg-white/[0.03] border border-white/10 overflow-hidden
+                transition-all duration-300 hover:-translate-y-2 no-underline
+                fade-up" style="animation-delay: 0.25s">
+        <div class="text-6xl float" style="animation-delay:0.7s">♟</div>
+        <div class="text-center">
+          <div class="orbitron text-sm font-black tracking-widest text-purple-300 mb-1">CHESS</div>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-purple-500/50 border border-purple-500/20 rounded-full px-2.5 py-0.5 uppercase">Strategy</span>
+        </div>
+        <p class="text-xs text-purple-300/40 leading-relaxed text-center flex-1">
+          Classic chess on a stunning 3D amethyst board. Play vs AI or a friend.
+        </p>
+        <button class="w-full py-3 rounded-xl orbitron text-xs font-black tracking-widest
+                       bg-gradient-to-r from-purple-500 to-violet-700 text-white
+                       transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-purple-500/30">
+          ▶ PLAY
+        </button>
+      </a>
+
+      <!-- Key Quest -->
+      <a href="./games/key-quest.html"
+         class="card card-quest group relative flex flex-col items-center gap-4 p-7 rounded-2xl
+                bg-white/[0.03] border border-white/10 overflow-hidden
+                transition-all duration-300 hover:-translate-y-2 no-underline
+                fade-up" style="animation-delay: 0.35s">
+        <div class="text-6xl float" style="animation-delay:1.4s">🗝️</div>
+        <div class="text-center">
+          <div class="orbitron text-sm font-black tracking-widest text-yellow-300 mb-1">KEY QUEST</div>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-yellow-500/50 border border-yellow-500/20 rounded-full px-2.5 py-0.5 uppercase">Puzzle</span>
+        </div>
+        <p class="text-xs text-purple-300/40 leading-relaxed text-center flex-1">
+          Collect all keys, dodge traps and enemies, reach the exit to escape.
+        </p>
+        <button class="w-full py-3 rounded-xl orbitron text-xs font-black tracking-widest
+                       bg-gradient-to-r from-yellow-400 to-amber-600 text-black
+                       transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-yellow-400/30">
+          ▶ PLAY
+        </button>
+      </a>
+
+      <!-- Platformer -->
+      <a href="./games/platformer.html"
+         class="card card-platform group relative flex flex-col items-center gap-4 p-7 rounded-2xl
+                bg-white/[0.03] border border-white/10 overflow-hidden
+                transition-all duration-300 hover:-translate-y-2 no-underline
+                fade-up" style="animation-delay: 0.45s">
+        <div class="text-6xl float" style="animation-delay:2.1s">⚡</div>
+        <div class="text-center">
+          <div class="orbitron text-sm font-black tracking-widest text-orange-300 mb-1">NEON RUSH</div>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-orange-500/50 border border-orange-500/20 rounded-full px-2.5 py-0.5 uppercase">Platformer</span>
+        </div>
+        <p class="text-xs text-purple-300/40 leading-relaxed text-center flex-1">
+          Jump, dash and double-jump across neon platforms. Don't fall into the void!
+        </p>
+        <button class="w-full py-3 rounded-xl orbitron text-xs font-black tracking-widest
+                       bg-gradient-to-r from-orange-500 to-red-600 text-white
+                       transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-orange-500/30">
+          ▶ PLAY
+        </button>
+      </a>
+
+      <!-- Neon Drive 3D -->
+      <a href="./games/photoreal-3d/index.html"
+         class="card card-drive group relative flex flex-col items-center gap-4 p-7 rounded-2xl
+                bg-white/[0.03] border border-white/10 overflow-hidden
+                transition-all duration-300 hover:-translate-y-2 no-underline
+                fade-up" style="animation-delay: 0.55s">
+        <div class="text-6xl float" style="animation-delay:2.8s">🚗</div>
+        <div class="text-center">
+          <div class="orbitron text-sm font-black tracking-widest text-sky-300 mb-1">NEON DRIVE 3D</div>
+          <span class="text-[10px] font-bold tracking-[0.2em] text-sky-500/50 border border-sky-500/20 rounded-full px-2.5 py-0.5 uppercase">3D Racing</span>
+        </div>
+        <p class="text-xs text-purple-300/40 leading-relaxed text-center flex-1">
+          Dodge traffic on a neon highway. Photorealistic 3D with bloom &amp; PBR lighting.
+        </p>
+        <button class="w-full py-3 rounded-xl orbitron text-xs font-black tracking-widest
+                       bg-gradient-to-r from-sky-400 to-cyan-600 text-black
+                       transition-all duration-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-sky-400/30">
+          ▶ PLAY
+        </button>
+      </a>
+
+    </div>
+
+    <!-- Footer -->
+    <p class="text-purple-900 text-[10px] tracking-[0.25em] uppercase fade-up" style="animation-delay:0.5s">
+      Built with vanilla JS &amp; Three.js · 4 canvas games + 1 WebGL 3D
+    </p>
+
+  </div>
+
+  <script>
+    const canvas = document.getElementById('stars')
+    const ctx = canvas.getContext('2d')
+    const STARS = Array.from({ length: 140 }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: 0.3 + Math.random() * 1.1,
+      b: Math.random() * Math.PI * 2,
+      s: 0.4 + Math.random() * 1.4,
+    }))
+
+    function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+    window.addEventListener('resize', resize)
+    resize()
+
+    ;(function draw(ts) {
+      const t = ts / 1000
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      STARS.forEach(s => {
+        ctx.globalAlpha = (0.15 + 0.6 * Math.abs(Math.sin(t * s.s + s.b)))
+        ctx.fillStyle = '#fff'
+        ctx.beginPath()
+        ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2)
+        ctx.fill()
+      })
+      ctx.globalAlpha = 1
+      requestAnimationFrame(draw)
+    })(0)
+  </script>
+
+</body>
+</html>

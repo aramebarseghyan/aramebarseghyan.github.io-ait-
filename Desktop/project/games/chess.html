@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chess</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/chess.css">
+</head>
+<body>
+
+<!-- Mode select screen -->
+<div id="mode-select">
+  <div class="ms-title">♟ CHESS</div>
+  <div class="ms-sub">Choose game mode</div>
+  <!-- Step 1: mode -->
+  <div id="ms-step-mode" style="display:flex;flex-direction:column;align-items:center;gap:24px;width:100%">
+    <div class="ms-cards">
+      <div class="ms-card ai" onclick="selectMode('ai')">
+        <div class="ms-icon">🤖</div>
+        <div class="ms-name">vs AI</div>
+        <div class="ms-desc">Play against the computer.<br>You play as White.</div>
+      </div>
+      <div class="ms-card local" onclick="startGame('local')">
+        <div class="ms-icon">👥</div>
+        <div class="ms-name">Local</div>
+        <div class="ms-desc">Two players,<br>one device.</div>
+      </div>
+      <div class="ms-card network" onclick="startGame('network')">
+        <div class="ms-icon">🌐</div>
+        <div class="ms-name">Network</div>
+        <div class="ms-desc">Play online with a friend.<br>Coming soon.</div>
+      </div>
+    </div>
+    <a href="../index.html" style="font-family:'Orbitron',monospace;font-size:0.7rem;color:#5a4080;letter-spacing:0.1em;text-decoration:none;">← Back to Hub</a>
+  </div>
+
+  <!-- Step 2: difficulty (AI only) -->
+  <div id="ms-step-diff" style="display:none;flex-direction:column;align-items:center;gap:24px;width:100%">
+    <div class="ms-sub" style="color:rgba(255,170,64,0.7);margin-top:0">Choose difficulty</div>
+    <div class="ms-cards">
+      <div class="ms-card" style="border-color:rgba(80,220,100,0.4)" onclick="startGame('ai','easy')"
+           onmouseover="this.style.boxShadow='0 0 44px rgba(60,200,80,0.5)'" onmouseout="this.style.boxShadow=''">
+        <div class="ms-icon">🟢</div>
+        <div class="ms-name" style="color:#60ee80">Easy</div>
+        <div class="ms-desc">Random moves.<br>Great for beginners.</div>
+      </div>
+      <div class="ms-card" style="border-color:rgba(255,200,40,0.4)" onclick="startGame('ai','medium')"
+           onmouseover="this.style.boxShadow='0 0 44px rgba(220,180,0,0.5)'" onmouseout="this.style.boxShadow=''">
+        <div class="ms-icon">🟡</div>
+        <div class="ms-name" style="color:#ffcc40">Medium</div>
+        <div class="ms-desc">Prefers captures.<br>A fair challenge.</div>
+      </div>
+      <div class="ms-card" style="border-color:rgba(255,80,80,0.4)" onclick="startGame('ai','hard')"
+           onmouseover="this.style.boxShadow='0 0 44px rgba(220,50,50,0.5)'" onmouseout="this.style.boxShadow=''">
+        <div class="ms-icon">🔴</div>
+        <div class="ms-name" style="color:#ff6060">Hard</div>
+        <div class="ms-desc">Thinks ahead 3 moves.<br>Good luck!</div>
+      </div>
+    </div>
+    <button onclick="document.getElementById('ms-step-diff').style.display='none';document.getElementById('ms-step-mode').style.display='flex'"
+      style="font-family:'Orbitron',monospace;font-size:0.7rem;color:#5a4080;letter-spacing:0.1em;background:none;border:none;cursor:pointer;">← Back</button>
+  </div>
+</div>
+
+<canvas id="stars"></canvas>
+<canvas id="board-canvas"></canvas>
+<a href="../index.html" id="back-btn">← Hub</a>
+<div id="game-btns">
+  <button onclick="resetGame()" id="restart-btn">↺ Restart</button>
+  <button onclick="openSettings()" id="settings-btn">⚙ Mode</button>
+  <button onclick="openAdminPanel()" id="admin-chess-btn" style="display:none">🔐 Admin</button>
+</div>
+
+<!-- Admin login modal -->
+<div id="chess-admin-modal" style="display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center">
+  <div style="background:linear-gradient(160deg,rgba(18,8,44,0.97),rgba(8,4,22,0.99));border:1.5px solid rgba(160,80,255,0.42);border-radius:22px;padding:44px 52px;min-width:300px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 0 60px rgba(120,0,220,0.32)">
+    <div style="font-size:2.4rem;filter:drop-shadow(0 0 14px rgba(180,80,255,0.65))">🔐</div>
+    <div style="font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:900;letter-spacing:0.14em;color:#c880ff;text-shadow:0 0 20px rgba(180,80,255,.55)">ADMIN LOGIN</div>
+    <input id="chess-admin-pw" type="password" placeholder="Enter admin code" maxlength="32" autocomplete="off"
+      style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(160,80,255,0.38);border-radius:10px;color:#e0ccff;font-size:1rem;padding:11px 16px;outline:none;font-family:'Orbitron',monospace;letter-spacing:0.14em;text-align:center">
+    <div id="chess-admin-msg" style="font-size:0.74rem;min-height:16px;color:#ff6666;letter-spacing:0.06em"></div>
+    <div style="display:flex;gap:10px">
+      <button onclick="tryAdminLogin()" style="background:linear-gradient(135deg,rgba(120,0,220,0.65),rgba(80,0,160,0.55));border:1px solid rgba(200,100,255,0.50);color:#e0aaff;padding:10px 28px;border-radius:10px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:'Orbitron',monospace">🔓 Login</button>
+      <button onclick="closeAdminModal()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#8878a8;padding:10px 22px;border-radius:10px;font-size:0.84rem;font-weight:700;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div id="chess-admin-panel" style="display:none;position:fixed;top:0;right:0;bottom:0;z-index:2500;width:min(320px,90vw);background:linear-gradient(180deg,rgba(14,6,36,0.98),rgba(8,3,20,0.99));border-left:1.5px solid rgba(160,80,255,0.35);box-shadow:-8px 0 40px rgba(100,0,200,0.25);overflow-y:auto;padding:20px 18px 30px;display:flex;flex-direction:column;gap:14px"></div>
+<div id="title">♟ CHESS</div>
+<div id="hint"></div>
+<div id="turn-indicator">♙ White to move</div>
+<div id="mode-badge"></div>
+  <div id="ac-toast">⚠️ Access Denied: Inspection is prohibited!</div>
+<script src="../js/chess.js"></script>
+</body>
+</html>

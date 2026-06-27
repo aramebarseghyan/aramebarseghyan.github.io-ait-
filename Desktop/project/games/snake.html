@@ -1,0 +1,376 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Snake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/snake.css">
+  
+</head>
+<body>
+
+  <a href="../index.html" id="hub-btn">🎮 Hub</a>
+  <button id="snake-admin-btn">⚙ Admin</button>
+  <div id="snake-super-hint">🔧 Enter the correct code</div>
+
+  <!-- Admin sidebar -->
+  <div id="snake-admin-sidebar">
+    <div class="sa-hdr">
+      <span>⚙ Admin</span>
+      <button class="sa-close" id="snake-admin-close">✕</button>
+    </div>
+
+    <!-- Login form (shown when not logged in) -->
+    <div id="snake-adm-login">
+      <div style="font-size:2rem;text-align:center;margin-bottom:6px;filter:drop-shadow(0 0 10px rgba(180,80,255,0.6))">🔐</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:0.75rem;font-weight:900;letter-spacing:0.12em;color:#c880ff;text-align:center;margin-bottom:12px">ADMIN LOGIN</div>
+      <input id="snake-adm-pw-input" type="password" placeholder="Enter admin code" maxlength="32" autocomplete="off"
+        style="width:100%;background:rgba(255,255,255,0.07);border:1.5px solid rgba(160,80,255,0.38);border-radius:8px;color:#e0ccff;font-size:0.82rem;padding:9px 12px;outline:none;font-family:'Orbitron',monospace;letter-spacing:0.10em;text-align:center;transition:border-color 0.2s,box-shadow 0.2s;box-sizing:border-box;">
+      <div id="snake-adm-pw-msg" style="font-size:0.68rem;text-align:center;min-height:14px;color:#ff6666;margin-top:6px;letter-spacing:0.04em;"></div>
+      <button id="snake-adm-login-btn"
+        style="width:100%;margin-top:8px;background:linear-gradient(135deg,rgba(120,0,220,0.60),rgba(80,0,160,0.50));border:1px solid rgba(200,100,255,0.50);color:#e0aaff;padding:10px;border-radius:8px;font-size:0.78rem;font-weight:700;letter-spacing:0.06em;cursor:pointer;transition:background 0.15s,box-shadow 0.15s;">🔓 Login</button>
+    </div>
+
+    <!-- Controls (shown when logged in) -->
+    <div id="snake-adm-controls">
+    <button class="sa-btn" id="sa-godmode">🛡 God Mode</button>
+    <button class="sa-btn" id="sa-maxspeed">⚡ Max Speed</button>
+    <button class="sa-btn" id="sa-slowmode">🐢 Slow Mode</button>
+    <hr class="sa-sep">
+    <button class="sa-btn" id="sa-addfood">🟡 Spawn Food +5</button>
+    <button class="sa-btn" id="sa-addscore">💰 +100 Score</button>
+    <button class="sa-btn" id="sa-multiplier">×2 Score Multiplier</button>
+    <hr class="sa-sep">
+    <button class="sa-btn" id="sa-trimsnake">✂️ Trim Snake → 3</button>
+    <button class="sa-btn" id="sa-forcspecial">💎 Force Special Food</button>
+    <button class="sa-btn" id="sa-forcbomb">💣 Spawn Bomb</button>
+    <button class="sa-btn" id="sa-softreset">🔄 Soft Reset</button>
+    <hr class="sa-sep">
+    <button class="sa-btn active" id="sa-obstacles">🧱 Obstacles ON</button>
+    <button class="sa-btn" id="sa-rerollmap">🗺 Reroll Map</button>
+    <hr class="sa-sep">
+    <button class="sa-btn" id="sa-resethi">🗑 Reset Hi Score</button>
+    <hr class="sa-sep">
+    <button class="sa-btn" id="sa-open-super" style="border-color:rgba(157,0,255,0.45);color:#cc88ff;background:rgba(80,0,160,0.18);">🔧 Superadmin Panel</button>
+    <hr class="sa-sep">
+    <button class="sa-btn" id="sa-logout" style="border-color:rgba(255,60,60,0.45);color:#ff8888;background:rgba(120,0,0,0.18);">🚪 Log Out</button>
+    </div><!-- /#snake-adm-controls -->
+  </div>
+
+  <!-- Superadmin overlay -->
+  <div id="sa-overlay">
+
+    <!-- Login -->
+    <div id="sa-login-box">
+      <div class="sa-logo">🔧</div>
+      <h3>SUPERADMIN ACCESS</h3>
+      <div class="sa-sub">Restricted — Authorised Personnel Only</div>
+      <input id="sa-pw-input" type="password" placeholder="Enter superadmin code" maxlength="32" autocomplete="off">
+      <div id="sa-pw-msg"></div>
+      <button id="sa-login-cancel" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);color:#8878a8;padding:8px 22px;border-radius:10px;font-size:0.82rem;font-weight:700;cursor:pointer;transition:background 0.15s;">✕ Cancel</button>
+    </div>
+
+    <!-- Controls -->
+    <div id="sa-controls">
+      <div id="sa-ctrl-header">
+        <div id="sa-ctrl-header-left">
+          <span id="sa-ctrl-icon">🔧</span>
+          <div>
+            <div id="sa-ctrl-title">SUPERADMIN PANEL</div>
+            <div id="sa-ctrl-sub">🟢 Authenticated — Full Access</div>
+          </div>
+        </div>
+        <button id="sa-close-btn">✕ Close</button>
+      </div>
+
+      <div id="sa-cards">
+
+        <!-- Passwords -->
+        <div class="sa-card">
+          <div class="sa-card-title">🔑 Change Admin Password</div>
+          <input id="sa-new-admpw1" type="password" placeholder="New password"     maxlength="32" autocomplete="new-password">
+          <input id="sa-new-admpw2" type="password" placeholder="Confirm password" maxlength="32" autocomplete="new-password">
+          <div id="sa-admpw-msg" class="sa-msg"></div>
+          <button class="sa-action sa-purple" id="sa-save-admpw">💾 Save Admin Password</button>
+          <div class="sa-sep" style="border-top:1px solid rgba(157,0,255,0.14);margin:4px 0;"></div>
+          <div class="sa-card-title">🔧 Change Superadmin Code</div>
+          <input id="sa-new-superpw1" type="password" placeholder="New code"     maxlength="32" autocomplete="new-password">
+          <input id="sa-new-superpw2" type="password" placeholder="Confirm code" maxlength="32" autocomplete="new-password">
+          <div id="sa-superpw-msg" class="sa-msg"></div>
+          <button class="sa-action sa-dim" id="sa-save-superpw">🔒 Save Superadmin Code</button>
+        </div>
+
+        <!-- Highscore & Data -->
+        <div class="sa-card">
+          <div class="sa-card-title">🏆 Snake Highscore Editor</div>
+          <div class="sa-row">
+            <input id="sa-hs-input" type="number" min="0" placeholder="New value" autocomplete="off">
+            <button class="sa-action sa-gold" id="sa-hs-save">Set</button>
+          </div>
+          <div class="sa-sec-row" style="margin-top:4px;">
+            <span class="sa-sec-label">Current:</span>
+            <span class="sa-sec-val" id="sa-hs-display">0</span>
+          </div>
+          <div class="sa-sep" style="border-top:1px solid rgba(157,0,255,0.14);margin:6px 0;"></div>
+          <div class="sa-card-title">🗑️ Data</div>
+          <button class="sa-action sa-red" id="sa-wipe-data">🗑️ Wipe All Snake Data</button>
+        </div>
+
+        <!-- Session & Security -->
+        <div class="sa-card">
+          <div class="sa-card-title">🛡️ Session & Security</div>
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(160,80,255,0.16);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;">
+            <div class="sa-sec-row">
+              <span class="sa-sec-label">Admin session:</span>
+              <span class="sa-sec-val" id="sa-sec-session">—</span>
+            </div>
+            <div class="sa-sec-row">
+              <span class="sa-sec-label">Snake hi-score:</span>
+              <span class="sa-sec-val" id="sa-sec-hi">0</span>
+            </div>
+            <div class="sa-sec-row">
+              <span class="sa-sec-label">Admin pw set:</span>
+              <span class="sa-sec-val" id="sa-sec-pwset">—</span>
+            </div>
+          </div>
+          <button class="sa-action sa-red" id="sa-revoke-session" style="margin-top:4px;">🚪 Revoke Admin Session</button>
+          <button class="sa-action" id="sa-exit-super" style="margin-top:4px;background:linear-gradient(135deg,rgba(80,0,120,0.55),rgba(50,0,80,0.45));border:1px solid rgba(180,80,255,0.45);color:#cc88ff;">🔒 Exit Superadmin Session</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <h1>🐍 NEON SNAKE</h1>
+
+  <div id="hud">
+    <div class="hud-item">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-val" id="hud-score">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">BEST</span>
+      <span class="hud-val" id="hud-hi">0</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">LENGTH</span>
+      <span class="hud-val" id="hud-len-val" style="color:#cc88ff">3</span>
+    </div>
+    <div class="hud-item">
+      <span class="hud-label">SPEED</span>
+      <span class="hud-val" id="hud-speed-val" style="color:#00ffee">1</span>
+    </div>
+  </div>
+
+  <div id="canvas-wrap">
+    <canvas id="game-canvas"></canvas>
+  </div>
+
+  <div id="hint">WASD / Arrows &nbsp;·&nbsp; Space = pause &nbsp;·&nbsp; 🟡 +10 &nbsp;·&nbsp; ✦ +50</div>
+
+  <!-- Pause overlay -->
+  <div id="pause-overlay">
+    <div class="pause-card">⏸ PAUSED</div>
+    <div class="pause-hint">SPACE / ESC to resume</div>
+  </div>
+
+  <!-- D-pad -->
+  <div id="dpad">
+    <div class="dp-empty"></div>
+    <button class="dp-btn" id="dp-up">▲</button>
+    <div class="dp-empty"></div>
+    <button class="dp-btn" id="dp-left">◀</button>
+    <div class="dp-empty"></div>
+    <button class="dp-btn" id="dp-right">▶</button>
+    <div class="dp-empty"></div>
+    <button class="dp-btn" id="dp-down">▼</button>
+    <div class="dp-empty"></div>
+  </div>
+
+  <!-- Mobile pause button -->
+  <button id="snake-pause-btn">⏸</button>
+
+  <!-- Start overlay -->
+  <div class="overlay visible" id="start-overlay">
+    <div class="menu-card">
+      <div class="menu-title">🐍 NEON SNAKE</div>
+
+      <!-- Difficulty -->
+      <div>
+        <div class="menu-label">Difficulty</div>
+        <div class="diff-row">
+          <button class="diff-opt" data-diff="easy">Easy</button>
+          <button class="diff-opt active-normal" data-diff="normal">Normal</button>
+          <button class="diff-opt" data-diff="hard">Hard</button>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div>
+        <div class="menu-label">Features</div>
+        <div class="feat-row">
+          <button class="feat-toggle on" id="feat-obstacles" data-feat="obstacles">
+            <span class="ft-icon">🧱</span>
+            <div><div>Blocks</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle on" id="feat-portals" data-feat="portals">
+            <span class="ft-icon">🌀</span>
+            <div><div>Portals</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle on" id="feat-bombs" data-feat="bombs">
+            <span class="ft-icon">💣</span>
+            <div><div>Bombs</div><div class="ft-status">ON</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Skin -->
+      <div>
+        <div class="menu-label">Skin</div>
+        <div class="skin-row">
+          <button class="skin-swatch active" data-skin="cyan"   style="background:linear-gradient(135deg,#aaffff,#0099cc)" title="Cyan"></button>
+          <button class="skin-swatch"        data-skin="green"  style="background:linear-gradient(135deg,#aaffcc,#00aa55)" title="Green"></button>
+          <button class="skin-swatch"        data-skin="orange" style="background:linear-gradient(135deg,#ffcc88,#ee5500)" title="Orange"></button>
+          <button class="skin-swatch"        data-skin="pink"   style="background:linear-gradient(135deg,#ffaaee,#cc1188)" title="Pink"></button>
+          <button class="skin-swatch"        data-skin="gold"   style="background:linear-gradient(135deg,#fff0aa,#cc8800)" title="Gold"></button>
+        </div>
+      </div>
+
+      <!-- More Options -->
+      <div>
+        <div class="menu-label">More Options</div>
+        <div class="feat-row" style="flex-wrap:wrap;">
+          <button class="feat-toggle" id="feat-wallwrap" data-feat2="wallwrap">
+            <span class="ft-icon">🔁</span>
+            <div><div>Wall Wrap</div><div class="ft-status">OFF</div></div>
+          </button>
+          <button class="feat-toggle on" id="feat-grid" data-feat2="grid">
+            <span class="ft-icon">⊞</span>
+            <div><div>Grid</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle on" id="feat-trail" data-feat2="trail">
+            <span class="ft-icon">✨</span>
+            <div><div>Trail</div><div class="ft-status">ON</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Food Count -->
+      <div>
+        <div class="menu-label">Food on Field</div>
+        <div class="diff-row">
+          <button class="food-opt active-easy" data-foodcount="1">1</button>
+          <button class="food-opt" data-foodcount="2">2</button>
+          <button class="food-opt" data-foodcount="3">3</button>
+        </div>
+      </div>
+
+      <button id="start-btn">▶ START</button>
+    </div>
+  </div>
+
+  <!-- Game Over overlay -->
+  <div class="overlay" id="gameover-overlay">
+    <div class="gameover-card">
+      <h2>GAME OVER</h2>
+      <p class="go-stat" id="go-score">Score: 0</p>
+      <p class="go-stat go-hi" id="go-hi">Best: 0</p>
+      <p class="go-newhi" id="go-newhi">🏆 New High Score!</p>
+      <div class="go-btns">
+        <button id="retry-btn">↺ Retry</button>
+        <button id="settings-btn">⚙ Settings</button>
+        <a href="../index.html" id="hub-from-go">🎮 Hub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings overlay -->
+  <div class="overlay" id="settings-overlay">
+    <div class="menu-card" style="position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:24px;">
+        <div class="menu-title" style="font-size:clamp(1.4rem,3.5vw,2rem);">⚙ Settings</div>
+        <button id="settings-close" style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(160,80,255,0.35);color:#a080d0;padding:8px 16px;border-radius:10px;font-size:0.82rem;font-weight:700;cursor:pointer;transition:background 0.15s;">✕ Close</button>
+      </div>
+
+      <!-- Difficulty -->
+      <div>
+        <div class="menu-label">Difficulty</div>
+        <div class="diff-row">
+          <button class="diff-opt-s" data-sdiff="easy">Easy</button>
+          <button class="diff-opt-s active-s-normal" data-sdiff="normal">Normal</button>
+          <button class="diff-opt-s" data-sdiff="hard">Hard</button>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div>
+        <div class="menu-label">Features</div>
+        <div class="feat-row">
+          <button class="feat-toggle-s on" id="sfeat-obstacles" data-sfeat="obstacles">
+            <span class="ft-icon">🧱</span>
+            <div><div>Blocks</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle-s on" id="sfeat-portals" data-sfeat="portals">
+            <span class="ft-icon">🌀</span>
+            <div><div>Portals</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle-s on" id="sfeat-bombs" data-sfeat="bombs">
+            <span class="ft-icon">💣</span>
+            <div><div>Bombs</div><div class="ft-status">ON</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Skin -->
+      <div>
+        <div class="menu-label">Skin</div>
+        <div class="skin-row">
+          <button class="skin-swatch-s" data-sskin="cyan"   style="background:linear-gradient(135deg,#aaffff,#0099cc)" title="Cyan"></button>
+          <button class="skin-swatch-s" data-sskin="green"  style="background:linear-gradient(135deg,#aaffcc,#00aa55)" title="Green"></button>
+          <button class="skin-swatch-s" data-sskin="orange" style="background:linear-gradient(135deg,#ffcc88,#ee5500)" title="Orange"></button>
+          <button class="skin-swatch-s" data-sskin="pink"   style="background:linear-gradient(135deg,#ffaaee,#cc1188)" title="Pink"></button>
+          <button class="skin-swatch-s" data-sskin="gold"   style="background:linear-gradient(135deg,#fff0aa,#cc8800)" title="Gold"></button>
+        </div>
+      </div>
+
+      <!-- Extra options -->
+      <div>
+        <div class="menu-label">More Options</div>
+        <div class="feat-row" style="flex-wrap:wrap;">
+          <button class="feat-toggle-s" id="sopt-wallwrap" data-sopt="wallwrap">
+            <span class="ft-icon">🔁</span>
+            <div><div>Wall Wrap</div><div class="ft-status">OFF</div></div>
+          </button>
+          <button class="feat-toggle-s" id="sopt-grid" data-sopt="grid">
+            <span class="ft-icon">⊞</span>
+            <div><div>Grid</div><div class="ft-status">ON</div></div>
+          </button>
+          <button class="feat-toggle-s" id="sopt-trail" data-sopt="trail">
+            <span class="ft-icon">✨</span>
+            <div><div>Trail</div><div class="ft-status">ON</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Food count -->
+      <div>
+        <div class="menu-label">Food on Field</div>
+        <div class="diff-row">
+          <button class="diff-opt-s active-s-easy" data-sfood="1">1</button>
+          <button class="diff-opt-s" data-sfood="2">2</button>
+          <button class="diff-opt-s" data-sfood="3">3</button>
+        </div>
+      </div>
+
+      <button id="settings-play-btn">▶ Play Again</button>
+    </div>
+  </div>
+
+  
+  <div id="ac-toast">⚠️ Access Denied: Inspection is prohibited!</div>
+  <script src="../js/snake.js"></script>
+</body>
+</html>

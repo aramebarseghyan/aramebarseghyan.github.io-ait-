@@ -1,0 +1,362 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Key Quest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/key-quest.css">
+</head>
+<body>
+
+  <!-- ── Main Menu ─────────────────────────────────────────────── -->
+  <div id="main-menu">
+    <div class="menu-card">
+      <div class="menu-title">🗝️ Key Quest</div>
+      <div id="menu-cleared-msg">🏆 All Levels Cleared! &nbsp;Admin Panel unlocked.</div>
+
+      <div class="menu-section">
+        <div class="menu-label">Difficulty</div>
+        <div class="menu-diff-row">
+          <button class="diff-btn" data-diff="easy">Easy</button>
+          <button class="diff-btn sel-normal" data-diff="normal">Normal</button>
+          <button class="diff-btn" data-diff="hard">Hard</button>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-label">Select Level</div>
+        <ul id="menu-level-list">
+          <li class="menu-lvl-btn selected" data-mlevel="0">Level 1</li>
+          <li class="menu-lvl-btn locked"   data-mlevel="1">🔒 Level 2</li>
+          <li class="menu-lvl-btn locked"   data-mlevel="2">🔒 Level 3</li>
+          <li class="menu-lvl-btn locked"   data-mlevel="3">🔒 Level 4</li>
+          <li class="menu-lvl-btn locked"   data-mlevel="4">🔒 Level 5</li>
+        </ul>
+      </div>
+
+      <button type="button" id="playBtn">▶ Start Game</button>
+      <button type="button" id="shopBtn">🍬 Shop</button>
+    </div>
+  </div>
+
+  <!-- ── Shop Modal ────────────────────────────────────────────────── -->
+  <div id="shop-modal">
+    <div class="shop-box">
+      <div class="shop-header">
+        <span class="shop-title">🍬 Candy Shop</span>
+        <span id="shop-balance">🍬 0 candies</span>
+        <button type="button" id="shopClose">← Back</button>
+      </div>
+      <div class="shop-items" id="shop-items-list">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <h1>Key Quest</h1>
+
+  <!-- ── In-game UI container ──────────────────────────────────────── -->
+  <div id="game-container">
+
+    <!-- Top bar: level tabs on the left, difficulty on the right -->
+    <div id="game-top-bar">
+      <ul id="level-select">
+        <li id="sel-1" class="active" data-level="0">Level 1</li>
+        <li id="sel-2" class="locked"  data-level="1">🔒 Level 2</li>
+        <li id="sel-3" class="locked"  data-level="2">🔒 Level 3</li>
+        <li id="sel-4" class="locked"  data-level="3">🔒 Level 4</li>
+        <li id="sel-5" class="locked"  data-level="4">🔒 Level 5</li>
+      </ul>
+      <div id="difficulty-bar">
+        <span class="hud-label">Difficulty:</span>
+        <button class="diff-btn" id="diff-easy"   data-diff="easy">Easy</button>
+        <button class="diff-btn sel-normal" id="diff-normal" data-diff="normal">Normal</button>
+        <button class="diff-btn" id="diff-hard"   data-diff="hard">Hard</button>
+      </div>
+    </div>
+
+    <!-- HUD: level, lives, key count, door status -->
+    <div id="hud">
+      <div class="hud-item">
+        <span class="hud-label">Level:</span>
+        <span class="hud-value" id="level-num">1 / 2</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Lives:</span>
+        <span id="lives">❤️❤️❤️</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Keys:</span>
+        <span class="hud-value" id="key-count">0 / 3</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Door:</span>
+        <span id="door-status">Locked</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Ghost (Q):</span>
+        <span id="ghost-status">Ready</span>
+      </div>
+      <div class="hud-item" id="hud-portal" style="display:none">
+        <span class="hud-label">Portal (E):</span>
+        <span id="portal-status">Ready</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">🍬 Candies:</span>
+        <span class="hud-value" id="candy-count">0</span>
+      </div>
+      <div class="hud-item" id="hud-shield" style="display:none">
+        <span class="hud-label">🛡️ Shield:</span>
+        <span class="hud-value" style="color:#66ccff">Active</span>
+      </div>
+      <div class="hud-item" id="hud-speed" style="display:none">
+        <span class="hud-label">⚡ Speed:</span>
+        <span class="hud-value" style="color:#ffee44" id="speed-timer">6s</span>
+      </div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Bottom bar: hint on the left, checkpoint center, admin right -->
+    <div id="game-bottom-bar">
+      <div id="hint">WASD / D-pad to move &nbsp;·&nbsp; Collect all keys, reach the exit &nbsp;·&nbsp; Q = Ghost Mode</div>
+      <button id="checkpoint-btn">💾 Save (50🍬)</button>
+      <div id="admin-panel">
+        <button id="admin-toggle">⚙ Admin (P)</button>
+      </div>
+    </div>
+
+  </div><!-- /#game-container -->
+
+  <!-- ── Mobile D-pad ─────────────────────────────────────────────────── -->
+  <div id="kq-dpad">
+    <div class="kq-dp-empty"></div>
+    <button class="kq-dp-btn" id="kq-dp-up">▲</button>
+    <div class="kq-dp-empty"></div>
+    <button class="kq-dp-btn" id="kq-dp-left">◀</button>
+    <div class="kq-dp-empty"></div>
+    <button class="kq-dp-btn" id="kq-dp-right">▶</button>
+    <div class="kq-dp-empty"></div>
+    <button class="kq-dp-btn" id="kq-dp-down">▼</button>
+    <div class="kq-dp-empty"></div>
+  </div>
+
+  <!-- ── Ghost action button ───────────────────────────────────────────── -->
+  <button id="kq-ghost-btn">
+    <div class="ghost-icon">👻</div>
+    <div class="ghost-label" id="kq-ghost-label">Q</div>
+  </button>
+
+  <!-- ── Admin Sidebar (fixed right, never overlaps canvas) ─────────── -->
+  <div id="admin-sidebar">
+    <div id="admin-sidebar-header">
+      <span>⚙ Admin Panel</span>
+      <button id="admin-sidebar-close" title="Close (P)">✕</button>
+    </div>
+
+    <!-- Password prompt -->
+    <div id="admin-pw-box">
+      <input id="admin-pw" type="password" placeholder="Enter code" maxlength="32" autocomplete="off">
+      <div id="admin-lock-msg" style="display:none;margin-top:8px;font-size:0.72rem;color:#ff6666;text-align:center;line-height:1.4;"></div>
+    </div>
+
+    <!-- Cheat controls -->
+    <div id="admin-controls">
+      <div id="admin-controls-title">Cheats — P to close</div>
+      <div id="adm-grid">
+        <button id="adm-shield" class="adm-btn">🛡️ Shield</button>
+        <button id="adm-freeze" class="adm-btn adm-freeze">❄️ Freeze</button>
+        <button id="adm-speed"  class="adm-btn adm-speed">⚡ Speed</button>
+        <button id="adm-keys"   class="adm-btn">🗝️ All Keys</button>
+        <button id="adm-skip"   class="adm-btn full">⏭️ Skip Level</button>
+      </div>
+
+      <!-- Post-game / authenticated section -->
+      <div id="adm-grid-post">
+        <div id="adm-grid-post-title">★ Unlocked Features</div>
+        <button id="adm-secret"     class="adm-btn post full">🗺️ Unlock Secret Level</button>
+        <button id="adm-skin"       class="adm-btn post full">🎨 Cycle Character Skin</button>
+        <button id="adm-unlock-all"   class="adm-btn post full">🔓 Unlock All Levels</button>
+        <button id="adm-reset"        class="adm-btn post full">🔄 Reset Progress</button>
+        <button id="adm-open-super"   class="adm-btn post full" style="border-color:rgba(157,0,255,0.45);color:#cc88ff;background:rgba(80,0,160,0.18);">🔧 Superadmin Panel</button>
+        <button id="adm-logout"       class="adm-btn post full" style="border-color:rgba(255,60,60,0.45);color:#ff8888;background:rgba(120,0,0,0.18);">🚪 Log Out</button>
+      </div>
+
+      <!-- Admin Exclusive Accessories -->
+      <div id="adm-accessories" style="display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,215,0,0.18);">
+        <div style="font-size:0.62rem;font-weight:800;letter-spacing:0.14em;color:#a08020;text-transform:uppercase;text-align:center;padding-bottom:4px;">🎨 Admin Accessories</div>
+        <button id="adm-mask"  class="adm-btn full">🎭 Hacker Mask</button>
+        <button id="adm-cape"  class="adm-btn full">🦸 Dev Cape</button>
+        <button id="adm-aura"  class="adm-btn full">✨ Admin Aura</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Superadmin Full-Screen Overlay ───────────────────────────── -->
+  <div id="superadmin-sidebar">
+
+    <!-- Login screen -->
+    <div id="adm-super-login">
+      <div id="sa-login-logo">🔧</div>
+      <div id="sa-login-title">SUPERADMIN ACCESS</div>
+      <div id="sa-login-sub">Restricted — Authorised Personnel Only</div>
+      <input id="adm-super-pw" type="password" placeholder="Enter superadmin code" maxlength="32" autocomplete="off">
+      <div id="adm-super-msg"></div>
+    </div>
+
+    <!-- Unlocked controls -->
+    <div id="adm-super-controls">
+      <div id="sa-header">
+        <div id="sa-header-left">
+          <span id="sa-header-icon">🔧</span>
+          <div>
+            <div id="sa-header-title">SUPERADMIN PANEL</div>
+            <div id="sa-header-sub">🟢 Authenticated — Full Access</div>
+          </div>
+        </div>
+        <button id="superadmin-sidebar-close">✕ Close</button>
+      </div>
+
+      <div id="sa-grid">
+
+        <!-- Col: Passwords -->
+        <div class="sa-card">
+          <div class="sa-card-title">🔑 Change Admin Password</div>
+          <input id="adm-new-pw"  type="password" placeholder="New password"     maxlength="32" autocomplete="new-password">
+          <input id="adm-new-pw2" type="password" placeholder="Confirm password" maxlength="32" autocomplete="new-password">
+          <div id="adm-pw-msg" class="super-msg"></div>
+          <button id="adm-save-pw" class="sa-btn sa-btn-purple">💾 Save Admin Password</button>
+
+          <div class="sa-sep"></div>
+
+          <div class="sa-card-title">🔧 Change Superadmin Code</div>
+          <input id="adm-new-super1" type="password" placeholder="New code"     maxlength="32" autocomplete="new-password">
+          <input id="adm-new-super2" type="password" placeholder="Confirm code" maxlength="32" autocomplete="new-password">
+          <div id="adm-super-code-msg" class="super-msg"></div>
+          <button id="adm-save-super-pw" class="sa-btn sa-btn-dim">🔒 Save Superadmin Code</button>
+        </div>
+
+        <!-- Col: Economy + Highscore -->
+        <div class="sa-card">
+          <div class="sa-card-title">⚡ Economy</div>
+          <button id="adm-give-candy" class="sa-btn sa-btn-gold">🍬 +1000 Candies</button>
+
+          <div class="sa-sep"></div>
+
+          <div class="sa-card-title">🏆 Highscore Editor</div>
+          <div class="super-row">
+            <input id="adm-hs-input" type="number" min="0" placeholder="New value" autocomplete="off">
+            <button id="adm-hs-save" class="sa-btn sa-btn-gold">Set</button>
+          </div>
+          <div class="sec-row" style="margin-top:4px;">
+            <span class="sec-label">Current:</span>
+            <span class="sec-val" id="adm-hs-display">0</span>
+          </div>
+
+          <div class="sa-sep"></div>
+
+          <div class="sa-card-title">🗑️ Data Management</div>
+          <button id="adm-wipe-data" class="sa-btn sa-btn-red">🗑️ Wipe Player Data</button>
+        </div>
+
+        <!-- Col: Security -->
+        <div class="sa-card">
+          <div class="sa-card-title">🛡️ Security Status</div>
+          <div id="adm-sec-status">
+            <div class="sec-row">
+              <span class="sec-label">Failed attempts:</span>
+              <span class="sec-val" id="adm-sec-attempts">0</span>
+            </div>
+            <div class="sec-row">
+              <span class="sec-label">Lock remaining:</span>
+              <span class="sec-val" id="adm-sec-locktime">—</span>
+            </div>
+            <div class="sec-row">
+              <span class="sec-label">Highscore:</span>
+              <span class="sec-val" id="adm-hs-display2">0</span>
+            </div>
+          </div>
+          <button id="adm-reset-lock" class="sa-btn sa-btn-orange">🔓 Reset Brute-Force Lock</button>
+        </div>
+
+      </div><!-- /#sa-grid -->
+      <div style="padding:10px 18px 4px;display:flex;justify-content:flex-end;">
+        <button id="adm-exit-super-session" style="background:linear-gradient(135deg,rgba(80,0,120,0.55),rgba(50,0,80,0.45));border:1px solid rgba(180,80,255,0.45);color:#cc88ff;padding:9px 20px;border-radius:10px;cursor:pointer;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;">🔒 Exit Superadmin Session</button>
+      </div>
+    </div><!-- /#adm-super-controls -->
+
+  </div><!-- /#superadmin-sidebar -->
+
+  <!-- ── Unified Access Login ──────────────────────────────────────── -->
+  <div id="unified-login">
+    <div id="ul-card">
+      <div id="ul-logo">⚙</div>
+      <div id="ul-title">ACCESS PANEL</div>
+      <div id="ul-sub">Enter admin code to unlock Shop &amp; Admin Panel</div>
+      <input id="ul-pw" type="password" placeholder="Enter access code" maxlength="32" autocomplete="off">
+      <div id="ul-msg"></div>
+      <div id="ul-attempts"></div>
+    </div>
+    <button id="ul-close">✕</button>
+  </div>
+
+  <!-- Game Over screen -->
+  <div id="gameover-overlay">
+    <div class="gameover-box">
+      <h2>Game Over</h2>
+      <p>You fell into every trap and lost all your lives.<br>The dungeon claims another adventurer…</p>
+      <button class="btn-danger" id="try-again-btn">↺ Start from Level 1</button>
+      <button class="btn-checkpoint" id="checkpoint-resume-btn" style="display:none">📍 Resume from Level <span id="checkpoint-level-display">?</span></button>
+    </div>
+  </div>
+
+  <!-- Grand finale victory overlay -->
+  <div id="victory-overlay">
+    <div class="victory-box">
+      <span class="trophy">🏆</span>
+      <h2>Congratulations!</h2>
+      <p>You Mastered the Maze!</p>
+      <p class="sub">All levels are now unlocked — play freely.</p>
+      <p class="sub">You have completed all levels! You can now use the Admin Panel freely without a password.</p>
+      <button class="btn-close" id="victory-close-btn">Play Freely →</button>
+    </div>
+  </div>
+
+  <!-- Level victory screen (shown for 5 s after beating a level) -->
+  <div id="level-victory">
+    <div id="lvictory-title">VICTORY!</div>
+    <div id="lvictory-reward"></div>
+    <div id="lvictory-sub">Returning to menu in 5s</div>
+  </div>
+
+  <!-- In-game Menu button (top-left, shown only after game starts) -->
+  <a href="../index.html" id="hub-btn">🎮 Hub</a>
+  <button id="menu-btn">☰ Menu</button>
+
+  <!-- Superadmin hint text (top-right) -->
+  <div id="kq-super-hint">🔧 Enter the correct code</div>
+
+  <!-- Full Reset button (top-right, always visible) -->
+  <button id="full-reset-btn">↺ Full Reset</button>
+
+  <!-- Confirm return-to-menu popup -->
+  <div id="confirm-modal">
+    <div class="confirm-box">
+      <h3>Return to Main Menu?</h3>
+      <p>Are you sure you want to return to the Main Menu?<br>Your current progress will be lost.</p>
+      <div class="confirm-btns">
+        <button id="confirm-yes">Yes, Go to Menu</button>
+        <button id="confirm-no">No, Keep Playing</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ac-toast">⚠️ Access Denied: Inspection is prohibited!</div>
+
+  <script src="../js/key-quest.js"></script>
+</body>
+</html>
