@@ -100,7 +100,7 @@ export class Vehicle {
       (gltf) => {
         const model = gltf.scene;
 
-        // 1. Ավտոմատ մասշտաբավորում
+        // 1. Scale so longest axis = 4 m
         const rawBox = new THREE.Box3().setFromObject(model);
         const rawSize = new THREE.Vector3();
         rawBox.getSize(rawSize);
@@ -108,23 +108,30 @@ export class Vehicle {
           (4.0 / Math.max(rawSize.x, rawSize.y, rawSize.z)) * CAR_SCALE;
         model.scale.setScalar(autoScale);
 
-        // 2. Ստեղծում ենք wrapper, որպեսզի առանց խնդրի պտտենք և կենտրոնացնենք
+        // 2. Fix orientation — add model to a wrapper, rotate wrapper,
+        //    then recompute bounds AFTER rotation for correct centering.
+        //
+        //    If car drives forward but faces SIDEWAYS → try Math.PI / 2
+        //    If car drives forward but faces BACKWARD  → try Math.PI
+        //    If car drives forward and looks correct   → keep 0
         const wrapper = new THREE.Group();
+        wrapper.rotation.y = 0;
         wrapper.add(model);
 
-        // Պտտում ենք մոդելը -90 աստիճան (կամ +90), որպեսզի ճիշտ նայի
-        wrapper.rotation.y = 100.3; wrapper.updateMatrixWorld(true);
+        // 3. Add to scene so matrixWorld updates correctly, then measure
+        this.mesh.add(wrapper);
+        wrapper.updateMatrixWorld(true);
 
-        // 3. Հաշվում ենք վերջնական կենտրոնը և ճշգրիտ տեղադրում մեքենան
         const finalBox = new THREE.Box3().setFromObject(wrapper);
         const center = new THREE.Vector3();
         finalBox.getCenter(center);
 
+        // 4. Center and sit on ground
         wrapper.position.x = -center.x;
         wrapper.position.z = -center.z;
-        wrapper.position.y = -finalBox.min.y - 0.45; // 0.45-ը ֆիզիկայի արկղի կեսն է
+        wrapper.position.y = -finalBox.min.y - 0.45;
 
-        wrapper.traverse((obj) => {
+        model.traverse((obj) => {
           const m = obj as THREE.Mesh;
           if (m.isMesh) {
             m.castShadow = true;
@@ -133,7 +140,6 @@ export class Vehicle {
         });
 
         this.mesh.remove(placeholder);
-        this.mesh.add(wrapper);
       },
       undefined,
       (err) => console.error("[sim] GLB failed:", err),
